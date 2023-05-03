@@ -2,33 +2,39 @@ package org.example;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+
 
     public class MainThird {
-        public static void main(String[] args) throws FileNotFoundException {
-            Map<String, Integer> wordFrequencyMap = countWordFrequency("words.txt");
-            for (String word : wordFrequencyMap.keySet()) {
-                System.out.println(word + " " + wordFrequencyMap.get(word));
-            }
-        }
-        public static Map<String, Integer> countWordFrequency(String fileName) throws FileNotFoundException {
-            Map<String, Integer> wordFrequencyMap = new HashMap<>();
-
-            File file = new File(fileName);
-            Scanner scanner = new Scanner(file);
-
-            while (scanner.hasNext()) {
-                String word = scanner.next().toLowerCase();
-                word = word.replaceAll("[^a-zA-Z0-9]", ""); // Видаляємо всі не-буквено-цифрові символи
-                wordFrequencyMap.put(word, wordFrequencyMap.getOrDefault(word, 0) + 1);
-            }
-
-            scanner.close();
-            return wordFrequencyMap;
-        }
 
 
+    public static void main(String[] args) {
+        Map<String, Integer> wordFrequencyMap = getWordFrequency("words.txt");
+        printWordFrequency(wordFrequencyMap);
     }
 
+    public static Map<String, Integer> getWordFrequency(String fileName) {
+        Map<String, Integer> wordFrequencyMap = new HashMap<>();
+        try (Scanner scanner = new Scanner(new File(fileName))) {
+            while (scanner.hasNext()) {
+                String word = scanner.next();
+                word = word.trim();
+                if (word.isEmpty()) {
+                    continue;
+                }
+                wordFrequencyMap.put(word, wordFrequencyMap.getOrDefault(word, 0) + 1);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + fileName);
+        }
+        return wordFrequencyMap;
+    }
+
+    public static void printWordFrequency(Map<String, Integer> wordFrequencyMap) {
+        List<Map.Entry<String, Integer>> wordFrequencyList = new ArrayList<>(wordFrequencyMap.entrySet());
+        wordFrequencyList.sort(Collections.reverseOrder(Map.Entry.comparingByValue()));
+        for (Map.Entry<String, Integer> entry : wordFrequencyList) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
+    }
+}
